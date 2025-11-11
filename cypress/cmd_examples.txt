@@ -1,0 +1,21 @@
+Here we have some commands to be executed from command line:
+
+1 - npx cypress run --spec "cypress/e2e/script_name.spec.js" //this command will execute the script_name in headless mode
+2 - npx cypress run --spec "cypress/e2e/script_name.spec.js" --browser firefox  //this command will execute the script_name in firefox
+
+On package.json at scripts section we can customize the commands to run those tests by usin npm:
+Example:
+
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cypress:smoke-firefox": "npx cypress run --spec 'cypress/e2e/api_headlessAuth.spec.js' --browser firefox",
+    "cypress:smoke-chrome": "npx cypress run --spec 'cypress/e2e/api_headlessAuth.spec.js' --browser chrome"
+  },
+
+  For running the script for "cypress:smoke-firefox" we should execute the following on command line:  npm cypress:smoke-firefox
+
+  Combine scripts looks like this on package.json:
+  "cypress:smoke-all": "npm run cypress:smoke-firefox && npm run cypress:smoke-chrome"
+
+  To execute tests in parallel (Linux and MAC) scripts looks like this on package.json (for been able to run int on Windows we need to install npm-run-all --> npm i npm-run-all):
+  "cypress:smoke-all-parallel": "npm-run-all cypress:smoke-chrome cypress:smoke-firefox"
