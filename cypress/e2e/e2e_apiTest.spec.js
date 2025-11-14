@@ -2,19 +2,8 @@
 
 describe("Test with APIS", () => {
   it("Delete Article", () => {
-    cy.request({
-      url: Cypress.env("api_url") + "/users/login",
-      method: "POST",
-      body: {
-        user: {
-          email: "cyTestAle1@test.com",
-          password: "Zf743563eKqVs@d",
-        },
-      },
-    }).then((response) => {
-      expect(response.status).to.equal(200);
-      const accessToken = "Token " + response.body.user.token;
-
+    cy.loginToApp();
+    cy.get("@accessToken").then((accessToken) => {
       cy.request({
         url: Cypress.env("api_url") + "/articles/",
         method: "POST",
@@ -26,7 +15,7 @@ describe("Test with APIS", () => {
             tagList: ["testTag"],
           },
         },
-        headers: { Authorization: accessToken },
+        headers: { Authorization: "Token "+accessToken },
       }).then((response) => {
         expect(response.status).to.equal(201);
         expect(response.body.article.title).to.equal("Test title Cypress -API");
@@ -34,7 +23,7 @@ describe("Test with APIS", () => {
       cy.request({
         url: Cypress.env("api_url") + "/articles?limit=1&offset=0",
         method: "GET",
-        headers: { Authorization: accessToken },
+        headers: { Authorization: "Token "+accessToken },
       }).then((response) => {
         expect(response.status).to.equal(200);
         expect(response.body.articles[0].title).to.equal(
@@ -45,7 +34,7 @@ describe("Test with APIS", () => {
         cy.request({
           url: Cypress.env("api_url") + `/articles/${slugId}`,
           method: "DELETE",
-          headers: { Authorization: accessToken },
+          headers: { Authorization: "Token "+accessToken },
         }).then((response) => {
           expect(response.status).to.equal(204);
         });

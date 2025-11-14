@@ -36,6 +36,7 @@ Cypress.Commands.add("loginToApp", () => {
   }).then((response) => {
     expect(response.status).to.equal(200);
     const accessToken = response.body.user.token;
+    Cypress.env("token", accessToken)
     cy.wrap(accessToken).as("accessToken");
     cy.visit("https://conduit.bondaracademy.com", {
       onBeforeLoad(win) {
@@ -44,3 +45,11 @@ Cypress.Commands.add("loginToApp", () => {
     });
   });
 });
+
+Cypress.Commands.add('loginToApplication', () => { 
+    cy.visit('/')
+    cy.contains('Sign in').click()
+    cy.get('[placeholder="Email"]').type(Cypress.env('email'))
+    cy.get('[placeholder="Password"]').type(Cypress.env('password'))
+    cy.contains('button', 'Sign in').click()
+ })

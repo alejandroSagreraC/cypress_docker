@@ -1,98 +1,115 @@
-///<reference types="cypress"/>
+/// <reference types="cypress" />
+import { faker } from "@faker-js/faker";
+beforeEach(() => {
+  cy.loginToApp();
+});
 
-describe("Test with APIS", () => {
-  it("Firs API test", () => {
-    cy.visit("/");
-    cy.intercept("GET", "**/tags", {
-      fixture: "tags.json",
-    });
-    cy.intercept("GET", "**/articles?limit=10&offset=0", {
-      fixture: "articles.json",
-    });
-    cy.loginToApp();
-  });
+it("first test", () => {
+  cy.intercept({ method: "GET", pathname: "tags" }, { fixture: "tags.json" });
+  cy.intercept("GET", "**/articles*", { fixture: "articles.json" });
+});
 
-  it("Intercept modify API response", () => {
-    cy.visit("/");
-    cy.intercept("GET", "**/articles?limit=10&offset=0", (req) => {
-      req.continue((res) => {
-        res.body.articles[0].favoritesCount = 9999999;
-        res.send(res.body);
-      });
+it("modify api response", { retries: 2 }, () => {
+  cy.intercept("GET", "**/articles*", (req) => {
+    req.continue((res) => {
+      res.body.articles[0].favoritesCount = 9999999;
+      res.send(res.body);
     });
-    cy.loginToApp();
-    cy.get("app-favorite-button").first().should("contain.text", "9999999");
   });
-  it("Intercept API response using RouteMatcher", () => {
-    cy.visit("/");
-    cy.intercept(
-      { method: "GET", pathname: "tags" },
-      {
-        fixture: "tags.json",
-      }
+  cy.get("app-favorite-button").first().should("contain.text", "9999999");
+});
+
+it("waiting for apis", () => {
+  cy.intercept("GET", "**/articles*").as("artcileApiCall");
+  cy.wait("@artcileApiCall").then((apiArticleObject) => {
+    expect(apiArticleObject.response.body.articles[0].title).to.contain(
+      "Bondar Academy"
     );
-    cy.loginToApp();
   });
-  it("verify correct request and response", () => {
-    cy.contains("New Article").click();
-    cy.get('[placeholder="Article Title"]').type("New Post");
-    cy.get('[formcontrolname="description"]').type("New Description");
-    cy.get("textarea").type("Test");
-    cy.get('[placeholder="Enter tags"]').type("NewTest");
-    cy.get("button").contains(".btn-primary", "Publish Article").click();
-  });
-  it("Waiting for AP response", () => {
-    cy.visit("/");
-    cy.loginToApp();
-    cy.intercept("GET", "**/articles*").as("articleAPICall");
-    cy.wait("@articleAPICall").then((articleObject) => {
-      expect(articleObject.response.body.articles[0].title).to.contain(
-        "New Post"
-      );
+  cy.get("app-article-list")
+    .invoke("text")
+    .then((allArticleTexts) => {
+      expect(allArticleTexts).to.contain("Bondar Academy");
     });
-    cy.get("app-article-list")
-      .invoke("text")
-      .then((allArticleTexts) => {
-        expect(allArticleTexts).to.contain("Bondar Academy");
-      });
-  });
+});
 
-  it("Delete Article", () => {
+it("delete article", () => {
+  const titleOfTheArticle = faker.person.fullName();
+  cy.get("@accessToken").then((accessToken) => {
     cy.request({
-      url: "https://conduit-api.bondaracademy.com/api/users/login",
+      url: Cypress.env("api_url") + "/articles/",
       method: "POST",
       body: {
-        user: {
-          email: "cyTestAle1@test.com",
-          password: "Zf743563eKqVs@d",
+        article: {
+          title: titleOfTheArticle,
+          description: faker.person.jobTitle(),
+          body: faker.lorem.paragraph(10),
+          tagList: [],
         },
       },
+      headers: { Authorization: "Token " + accessToken },
     }).then((response) => {
-      expect(response.status).to.equal(200);
-      const accessToken = "Token " + response.body.user.token;
-
-      cy.request({
-        url: "https://conduit-api.bondaracademy.com/api/articles/",
-        method: "POST",
-        body: {
-          article: {
-            title: "Test title Cypress -3",
-            description: "Some description",
-            body: "This is a body",
-            tagList: ["testTag"],
-          },
-        },
-        headers: { Authorization: accessToken },
-      }).then((response) => {
-        expect(response.status).to.equal(201);
-        expect(response.body.article.title).to.equal("Test title Cypress -3");
-      });
+      expect(response.status).to.equal(201);
+      expect(response.body.article.title).to.equal(titleOfTheArticle);
     });
-    cy.loginToApp();
-    cy.contains("Test title Cypress -3").click();
-    cy.intercept("GET", "**/articles*").as("artcileApiCall");
-    cy.contains("button", "Delete Article").first().click();
-    cy.wait("@artcileApiCall");
-    cy.get("app-article-list").should("not.contain.text", "Test title Cypress -3");
+  });
+  cy.loginToApplication();
+  cy.intercept("GET", "**/articles*").as("artcileApiCall");
+  cy.wait("@artcileApiCall");
+  cy.contains(titleOfTheArticle).click();
+  cy.contains("button", "Delete Article").first().click();  
+  cy.get("app-article-list").should("not.contain.text", titleOfTheArticle);
+});
+
+it("api testing", () => {
+  const accessToken = "Token " + Cypress.env("token");
+  cy.request({
+    url: Cypress.env("api_url") + "/articles/",
+    method: "POST",
+    body: {
+      article: {
+        title: "Test title Cypress API Testing",
+        description: "Some description",
+        body: "This is a body",
+        tagList: [],
+      },
+    },
+    headers: { Authorization: accessToken },
+  }).then((response) => {
+    expect(response.status).to.equal(201);
+    expect(response.body.article.title).to.equal(
+      "Test title Cypress API Testing"
+    );
+  });
+
+  cy.request({
+    url: Cypress.env("api_url") + "/articles?limit=10&offset=0",
+    method: "GET",
+    headers: { Authorization: accessToken },
+  }).then((response) => {
+    expect(response.status).to.equal(200);
+    expect(response.body.articles[0].title).to.equal(
+      "Test title Cypress API Testing"
+    );
+    const slugID = response.body.articles[0].slug;
+
+    cy.request({
+      url: `${Cypress.env("api_url")}/articles/${slugID}`,
+      method: "DELETE",
+      headers: { Authorization: accessToken },
+    }).then((response) => {
+      expect(response.status).to.equal(204);
+    });
+  });
+
+  cy.request({
+    url: Cypress.env("api_url") + "/articles?limit=10&offset=0",
+    method: "GET",
+    headers: { Authorization: accessToken },
+  }).then((response) => {
+    expect(response.status).to.equal(200);
+    expect(response.body.articles[0].title).to.not.equal(
+      "Test title Cypress API Testing"
+    );
   });
 });

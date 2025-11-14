@@ -5,7 +5,7 @@ describe("Test with APIS", () => {
     cy.loginToApp();
     cy.get("@accessToken").then((accessToken) => {
       cy.request({
-        url: "https://conduit-api.bondaracademy.com/api/articles/",
+        url: Cypress.env("api_url") + "/articles/",
         method: "POST",
         body: {
           article: {
@@ -21,7 +21,7 @@ describe("Test with APIS", () => {
         expect(response.body.article.title).to.equal("Test title Cypress -API");
       });
       cy.request({
-        url: "https://conduit-api.bondaracademy.com/api/articles?limit=1&offset=0",
+        url: Cypress.env("api_url") + "/articles?limit=1&offset=0",
         method: "GET",
         headers: { Authorization: "Token " + accessToken },
       }).then((response) => {
@@ -38,7 +38,7 @@ describe("Test with APIS", () => {
           expect(response.status).to.equal(204);
         });
         cy.request({
-          url: "https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0",
+          url: Cypress.env("api_url") + "/articles?limit=10&offset=0",
           method: "GET",
           headers: { Authorization: "Token " + accessToken },
         }).then((response) => {

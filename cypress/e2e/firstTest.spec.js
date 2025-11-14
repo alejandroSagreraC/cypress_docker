@@ -1,7 +1,7 @@
 ///<reference types="cypress"/>
 describe("Test with backend", () => {
   beforeEach("login to app", () => {
-    cy.loginToApp();
+    cy.loginToApplication();
   });
   it("verify correct request and response", () => {
     cy.contains("New Article").click();
