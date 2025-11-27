@@ -1,7 +1,5 @@
 # Cypress Docker
 
-![banner](docs/banner.svg)
-
 A lightweight setup for running **Cypress end-to-end tests** inside a fully reproducible **Docker environment**.  
 No need to install Node, Cypress, or browsers on your machine — everything runs in the container.
 
