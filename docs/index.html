@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cypress Docker — End-to-End Tests in Docker</title>
+
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --accent: #0366d6;
+    --code-bg: #f5f5f5;
+    --border: #dcdcdc;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117;
+      --fg: #e6edf3;
+      --accent: #2f81f7;
+      --code-bg: #161b22;
+      --border: #30363d;
+    }
+  }
+
+  body {
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    margin: 0 auto;
+    padding: 2rem;
+    max-width: 900px;
+    line-height: 1.7;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  h1, h2, h3 {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .3rem;
+  }
+
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow: auto;
+    position: relative;
+  }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 5px;
+    border-radius: 4px;
+  }
+
+  .toc ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .toc li {
+    margin: .4rem 0;
+  }
+
+  details {
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem;
+  }
+
+  summary {
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    padding: 5px 10px;
+    font-size: .8rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background: var(--accent);
+    color: white;
+    opacity: .8;
+    transition: 0.2s;
+  }
+
+  .copy-btn:hover { opacity: 1; }
+
+  #themeToggle {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    opacity: .85;
+  }
+  #themeToggle:hover { opacity: 1; }
+</style>
+
+<style>
+  .token.comment { color: #6a9955; }
+  .token.keyword { color: #569cd6; }
+  .token.string { color: #d69d85; }
+</style>
+<script>
+  function copyCode(btn) {
+    const code = btn.parentElement.querySelector("code").innerText;
+    navigator.clipboard.writeText(code);
+    btn.innerText = "Copied!";
+    setTimeout(() => (btn.innerText = "Copy"), 1200);
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute("data-theme");
+    html.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+  }
+</script>
+</head>
+
+<body>
+
+<button id="themeToggle" onclick="toggleTheme()">Toggle Theme</button>
+
+<h1>Cypress Docker</h1>
+<p><em>End-to-end tests running inside a reproducible Docker environment.</em></p>
+
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#structure">Project Structure</a></li>
+    <li><a href="#install">Running Tests</a></li>
+    <li><a href="#docker">Docker Setup</a></li>
+    <li><a href="#notes">Notes</a></li>
+  </ul>
+</div>
+
+<h2 id="about">About</h2>
+<p>
+  This repository packages Cypress tests inside a Docker container, allowing you to run
+  full end-to-end suites without installing Node, Cypress, or any browsers locally.
+</p>
+
+<p>
+  Running Cypress in Docker ensures tests are:
+</p>
+
+<ul>
+  <li><strong>Fully reproducible</strong> — same environment for all developers and CI</li>
+  <li><strong>Isolated</strong> — no dependency conflicts</li>
+  <li><strong>Easy to run</strong> — just one Docker command</li>
+</ul>
+
+<h2 id="structure">Project Structure</h2>
+
+<details open>
+<summary>Repository Tree</summary>
+<pre><code>
+cypress_docker/
+├── cypress/
+│   ├── e2e/
+│   ├── fixtures/
+│   ├── support/
+├── cypress.config.js
+├── Dockerfile
+├── docker-compose.yml
+├── package.json
+├── package-lock.json
+├── .gitignore
+├── .dockerignore
+└── Docker_cmd.txt
+</code></pre>
+</details>
+
+<h2 id="install">Running Tests</h2>
+
+<details open>
+<summary>Method 1 — Using Docker Compose (recommended)</summary>
+<pre>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>docker-compose up</code>
+</pre>
+</details>
+
+<details>
+<summary>Method 2 — Manually build & run Docker image</summary>
+<pre>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>docker build -t cypress_docker .
+docker run --rm cypress_docker</code>
+</pre>
+</details>
+
+<h2 id="docker">Docker Setup</h2>
+<p>The environment is composed of:</p>
+
+<ul>
+  <li><strong>Dockerfile</strong> — sets up Node, Cypress, required dependencies</li>
+  <li><strong>docker-compose.yml</strong> — runs the tests inside the container</li>
+</ul>
+
+<p>
+This makes it extremely easy to integrate Cypress with CI tools like GitHub Actions,
+GitLab CI, Jenkins, or CircleCI.
+</p>
+
+<h2 id="notes">Notes</h2>
+<ul>
+  <li>You can add environment variables in <code>docker-compose.yml</code>.</li>
+  <li>Test files live inside <code>cypress/e2e/</code>.</li>
+  <li>Update <code>cypress.config.js</code> with your project URL and test settings.</li>
+</ul>
+
+</body>
+</html>
