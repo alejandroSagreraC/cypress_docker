@@ -11,11 +11,13 @@ module.exports = defineConfig({
   reporter: "cypress-multi-reporters",
   reporterOptions: {
     configFile: "cypress/reporter-config.json",
-    
   },
   e2e: {
     setupNodeEvents(on, config) {
-      require('cypress-mochawesome-reporter/plugin')(on);
+      require("cypress-mochawesome-reporter/plugin")(on);
+      const { plugin: cypressGrepPlugin } = require("@cypress/grep/plugin");
+      cypressGrepPlugin(config);
+      return config
       // implement node event listeners here
     },
     baseUrl: "https://conduit.bondaracademy.com/",

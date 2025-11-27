@@ -19,3 +19,9 @@ Example:
 
   To execute tests in parallel (Linux and MAC) scripts looks like this on package.json (for been able to run int on Windows we need to install npm-run-all --> npm i npm-run-all):
   "cypress:smoke-all-parallel": "npm-run-all cypress:smoke-chrome cypress:smoke-firefox"
+
+  - Cypress grep allows us to use filters for test execution and also the ability to retry tests
+    -command:
+    npx cypress run --env grepTags="@smoke",grepOmitFiltered=true,burn=2
+    grepOmitFiltered will omit those test that are not smoke to be shown on the tests results in command line
+    burn will retry the tests the number of times given

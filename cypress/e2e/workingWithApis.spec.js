@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.loginToApp();
 });
 
-it("first test", () => {
+it("first test", { tags: "@smoke" }, () => {
   cy.intercept({ method: "GET", pathname: "tags" }, { fixture: "tags.json" });
   cy.intercept("GET", "**/articles*", { fixture: "articles.json" });
 });
@@ -33,7 +33,7 @@ it("waiting for apis", () => {
     });
 });
 
-it("delete article", () => {
+it("delete article", { tags: "@smoke" },() => {
   const titleOfTheArticle = faker.person.fullName();
   cy.get("@accessToken").then((accessToken) => {
     cy.request({
@@ -57,7 +57,7 @@ it("delete article", () => {
   cy.intercept("GET", "**/articles*").as("artcileApiCall");
   cy.wait("@artcileApiCall");
   cy.contains(titleOfTheArticle).click();
-  cy.contains("button", "Delete Article").first().click();  
+  cy.contains("button", "Delete Article").first().click();
   cy.get("app-article-list").should("not.contain.text", titleOfTheArticle);
 });
 

@@ -29,14 +29,14 @@ Cypress.Commands.add("loginToApp", () => {
     method: "POST",
     body: {
       user: {
-        email: Cypress.env('email'),
-        password: Cypress.env('password'),
+        email: Cypress.env("email"),
+        password: Cypress.env("password"),
       },
     },
   }).then((response) => {
     expect(response.status).to.equal(200);
     const accessToken = response.body.user.token;
-    Cypress.env("token", accessToken)
+    Cypress.env("token", accessToken);
     cy.wrap(accessToken).as("accessToken");
     cy.visit("https://conduit.bondaracademy.com", {
       onBeforeLoad(win) {
@@ -46,10 +46,25 @@ Cypress.Commands.add("loginToApp", () => {
   });
 });
 
-Cypress.Commands.add('loginToApplication', () => { 
-    cy.visit('/')
-    cy.contains('Sign in').click()
-    cy.get('[placeholder="Email"]').type(Cypress.env('email'))
-    cy.get('[placeholder="Password"]').type(Cypress.env('password'))
-    cy.contains('button', 'Sign in').click()
- })
+Cypress.Commands.add("loginToApplication", () => {
+  cy.visit("/");
+  cy.contains("Sign in").click();
+  cy.get('[placeholder="Email"]').type(Cypress.env("email"));
+  cy.get('[placeholder="Password"]').type(Cypress.env("password"));
+  cy.contains("button", "Sign in").click();
+}); 
+
+Cypress.Commands.add("uiLogin", () => {
+  cy.session("user", () => {
+    cy.visit("/");
+    cy.contains("Sign in").click();
+    cy.get('[placeholder="Email"]').type(Cypress.env("email"));
+    cy.get('[placeholder="Password"]').type(Cypress.env("password"));
+    cy.contains("button", "Sign in").click();
+    cy.location('pathname').should('eq','/')
+  },
+{
+  cacheAcrossSpecs:true //allows to use the session across files
+});
+  cy.visit("/");
+});

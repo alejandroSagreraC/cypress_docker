@@ -1,0 +1,16 @@
+Docker commands:
+
+- Building the docker 
+    - docker build -t cypress-tests .   --need to rebuild docker after changes made to dockerfile
+
+- Running the test from docker
+   - docker run cypress-tests
+
+- Building the compose file (allows me to extract the reports from docker)
+  - docker compose build
+
+- Running the compose file to extract the reports
+  - docker compose up
+
+- Running the compose file to stop execution and extraction
+ - docker compose down

@@ -1,7 +1,7 @@
 ///<reference types="cypress"/>
 
 describe("Test with APIS", () => {
-  it.only("Create and Delete Article API Headless Authorization", () => {
+  it("Create and Delete Article API Headless Authorization", () => {
     cy.loginToApp();
     cy.get("@accessToken").then((accessToken) => {
       cy.request({
