@@ -1,31 +1,116 @@
-# Cypress Docker
+# 🧪 Cypress + 🐳 Docker  
+A clean, lightweight template for running **Cypress tests inside Docker** — portable, consistent, and CI-friendly.
 
-A lightweight setup for running **Cypress end-to-end tests** inside a fully reproducible **Docker environment**.  
-No need to install Node, Cypress, or browsers on your machine — everything runs in the container.
-
----
-
-## 🚀 Live Documentation (GitHub Pages)
-A beautifully formatted HTML version of this README is available here:
-
-👉 **https://alejandroSagreraC.github.io/cypress_docker/**
+<p align="center">
+  <img src="https://img.shields.io/badge/Cypress-12.x-04C38E?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge" />
+</p>
 
 ---
 
-## 📦 What’s inside?
+## 🚀 Overview  
+This repository provides a plug-and-play environment for running **Cypress end-to-end tests in Docker**, ensuring reproducible results across machines and CI pipelines.
 
-- `cypress/` — test specs, fixtures, support files  
-- `cypress.config.js` — Cypress configuration  
-- `Dockerfile` — container image with Cypress + Node  
-- `docker-compose.yml` — one-command test runner  
-- `.dockerignore` / `.gitignore`  
-- `package.json`
+✔ No need to install Cypress locally  
+✔ Works on Windows, macOS, Linux  
+✔ Perfect for CI providers (GitHub Actions, GitLab, Jenkins, Bitbucket…)  
+✔ No flaky version mismatches — everything self-contained  
 
 ---
 
-## 🧪 Running the tests
+## 📦 Project Structure
 
-### **Using Docker Compose (recommended)**
+cypress_docker/
+├── cypress/
+│ ├── e2e/
+│ │ └── sample.cy.js # Example test
+│ ├── fixtures/
+│ ├── support/
+├── Dockerfile # Cypress-in-Docker base image
+├── docker-compose.yml # 1-command test execution
+└── README.md
 
-```bash
-docker-compose up
+
+## 🐳 Run Cypress in Docker (GUI or Headless)
+
+### **1️⃣ Build the Docker image**
+```sh
+docker build -t cypress-docker
+
+2️⃣ Run tests (headless mode)
+docker run --rm cypress-docker
+
+3️⃣ Run with docker-compose (recommended)
+docker-compose up --build
+
+🧪 Running Cypress Open (GUI Mode)
+
+You can open the Cypress GUI from inside the container using:
+docker run -it --entrypoint=cypress cypress-docker open
+
+🌐 GitHub Pages Documentation
+
+A cleaner formatted HTML version of this README is available at:
+
+👉 https://alejandroSagreraC.github.io/cypress_docker/
+
+(If you haven’t enabled GitHub Pages yet, check the instructions in the repo.)
+
+🛠️ Customization
+Use your own tests
+
+Place your tests in:
+cypress/e2e/*.cy.js
+
+Install additional npm packages
+
+Edit your Dockerfile:
+RUN npm install <package-name>
+
+📸 Screenshots (Optional)
+You can add screenshots like:
+cypress/screenshots/
+
+🤖 CI Integration
+This Docker setup works out of the box with any CI system.
+GitHub Actions Example
+
+name: Cypress Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build + test
+        run: |
+          docker-compose up --build --exit-code-from cypress
+
+📚 Useful Commands
+
+| Action          | Command                                                   |
+| --------------- | --------------------------------------------------------- |
+| Build image     | `docker build -t cypress-docker .`                        |
+| Run tests       | `docker run --rm cypress-docker`                          |
+| Open GUI        | `docker run -it --entrypoint=cypress cypress-docker open` |
+| Run via compose | `docker-compose up --build`                               |
+
+⭐ Contributions
+Pull requests are welcome!
+If you'd like new features (parallelization, artifacts, recordings), feel free to open an issue.
+
+📄 License
+MIT License — free for personal and commercial use.
+
+If you'd like, I can also:
+
+✨ Add a **banner image**  
+✨ Generate a **matching index.html** with better styling  
+✨ Add **icons**, **dark mode**, **syntax highlighting**  
+✨ Build extra **docs/* pages** (Docker, Cypress, CI Setup, Troubleshooting)
+
+Just tell me!
+
